@@ -74,16 +74,37 @@ export function CardLibrary({ cards, onEdit, onDelete }: CardLibraryProps) {
       </ScrollArea>
 
       <Dialog open={!!editingCard} onOpenChange={() => setEditingCard(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Card</DialogTitle>
           </DialogHeader>
           {editingCard && (
-            <CardForm
-              initialCard={editingCard}
-              onSubmit={handleEdit}
-              onCancel={() => setEditingCard(null)}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-muted-foreground">Current Card</h3>
+                <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs font-semibold text-blue-600 mb-2">QUESTION</p>
+                      <p className="text-sm font-medium text-gray-800">{editingCard.question}</p>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-semibold text-blue-600 mb-2">ANSWER</p>
+                      <p className="text-sm text-gray-700">{editingCard.answer}</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-muted-foreground">Edit Content</h3>
+                <CardForm
+                  initialCard={editingCard}
+                  onSubmit={handleEdit}
+                  onCancel={() => setEditingCard(null)}
+                />
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

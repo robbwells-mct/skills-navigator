@@ -85,14 +85,14 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">Skills Navigator</h1>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Skills Navigator</h1>
             <p className="text-muted-foreground mt-1">Master any subject with flashcards</p>
           </div>
-          <Badge variant="secondary" className="text-base px-4 py-2">
+          <Badge variant="secondary" className="text-base px-4 py-2 bg-blue-50 text-blue-700 border-blue-200">
             <Cards size={20} className="mr-2" />
             {cardList.length} {cardList.length === 1 ? 'Card' : 'Cards'}
           </Badge>

@@ -54,11 +54,11 @@ export function StudyMode({ cards, onExit }: StudyModeProps) {
   const currentCard = cards[currentIndex]
 
   return (
-    <div className="min-h-screen bg-background p-6 md:p-8">
+    <div className="min-h-screen p-6 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Study Mode</h2>
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">Study Mode</h2>
             <p className="text-sm text-muted-foreground">
               Card {currentIndex + 1} of {cards.length}
             </p>
