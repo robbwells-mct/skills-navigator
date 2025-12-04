@@ -4,19 +4,22 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Separator } from '@/components/ui/separator'
 import { Flashcard } from '@/lib/types'
 import { parseCSV, readFileAsText } from '@/lib/csv-parser'
+import { exportToPDF } from '@/lib/pdf-export'
 import { CardForm } from '@/components/CardForm'
 import { CardLibrary } from '@/components/CardLibrary'
 import { StudyMode } from '@/components/StudyMode'
-import { Plus, Upload, BookOpen, Cards } from '@phosphor-icons/react'
+import { Plus, Upload, BookOpen, Cards, FilePdf, Trash } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 function App() {
   const [cards, setCards] = useKV<Flashcard[]>('flashcards', [])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isStudying, setIsStudying] = useState(false)
+  const [isDeleteAllDialogOpen, setIsDeleteAllDialogOpen] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -80,6 +83,19 @@ function App() {
     }
   }
 
+  const handleExportPDF = () => {
+    if (cardList.length > 0) {
+      exportToPDF(cardList)
+      toast.success('PDF exported successfully!')
+    }
+  }
+
+  const handleDeleteAll = () => {
+    setCards([])
+    setIsDeleteAllDialogOpen(false)
+    toast.success('All flashcards deleted!')
+  }
+
   if (isStudying) {
     return <StudyMode cards={cardList} onExit={() => setIsStudying(false)} />
   }
@@ -106,7 +122,7 @@ function App() {
           </Alert>
         )}
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 items-center">
           <Button onClick={() => setIsAddDialogOpen(true)} size="lg">
             <Plus size={20} className="mr-2" />
             Add Card
@@ -129,6 +145,16 @@ function App() {
           />
 
           <Button
+            variant="outline"
+            size="lg"
+            onClick={handleExportPDF}
+            disabled={cardList.length === 0}
+          >
+            <FilePdf size={20} className="mr-2" />
+            Export PDF
+          </Button>
+
+          <Button
             variant="default"
             size="lg"
             onClick={handleStartStudy}
@@ -137,6 +163,16 @@ function App() {
           >
             <BookOpen size={20} className="mr-2" />
             Study Now
+          </Button>
+
+          <Button
+            size="lg"
+            onClick={() => setIsDeleteAllDialogOpen(true)}
+            disabled={cardList.length === 0}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            <Trash size={20} className="mr-2" />
+            Delete All
           </Button>
         </div>
 
@@ -189,6 +225,23 @@ function App() {
           />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={isDeleteAllDialogOpen} onOpenChange={setIsDeleteAllDialogOpen}>
+        <AlertDialogContent className="bg-white/95 backdrop-blur-sm shadow-2xl border-2">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">Delete All Flashcards</AlertDialogTitle>
+            <AlertDialogDescription className="text-base pt-2">
+              Are you sure you want to delete all {cardList.length} flashcard{cardList.length !== 1 ? 's' : ''}? This action cannot be undone and will permanently remove all your cards.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 mt-4">
+            <AlertDialogCancel className="px-6">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAll} className="bg-red-600 text-white hover:bg-red-700 px-6">
+              Delete All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
