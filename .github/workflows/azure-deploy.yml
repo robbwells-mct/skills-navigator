@@ -25,26 +25,25 @@ jobs:
     - name: Build application
       run: npm run build
     
-    - name: Copy configuration files to dist
+    - name: Add server + package.json to dist
       run: |
-        cp web.config dist/
-        cp staticwebapp.config.json dist/
-        cp startup.sh dist/
-        chmod +x dist/startup.sh
-    
-    - name: Create package.json for pm2
-      run: |
+        cp server-cjs.js dist/server.js
         cat > dist/package.json << 'EOF'
         {
           "name": "skills-navigator",
           "version": "1.0.0",
+          "private": true,
+          "main": "server.js",
+          "scripts": {
+            "start": "node server.js"
+          },
           "dependencies": {
-            "pm2": "^5.3.0"
+            "express": "^4.18.2"
           }
         }
         EOF
-    
-    - name: Install pm2
+
+    - name: Install production dependencies in dist
       run: cd dist && npm install --production
     
     - name: List dist contents for debugging
