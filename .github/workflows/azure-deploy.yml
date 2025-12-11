@@ -28,6 +28,7 @@ jobs:
     - name: Copy server files to dist
       run: |
         cp server-cjs.js dist/server.js
+        cp web.config dist/
     
     - name: Create production package.json for dist
       run: |
