@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -15,8 +14,29 @@ import { StudyMode } from '@/components/StudyMode'
 import { Plus, Upload, BookOpen, Cards, FilePdf, Trash } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
+const FLASHCARDS_STORAGE_KEY = 'flashcards'
+
+function loadFlashcardsFromStorage(): Flashcard[] {
+  try {
+    const raw = localStorage.getItem(FLASHCARDS_STORAGE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as Flashcard[]) : []
+  } catch {
+    return []
+  }
+}
+
+function saveFlashcardsToStorage(cards: Flashcard[]) {
+  try {
+    localStorage.setItem(FLASHCARDS_STORAGE_KEY, JSON.stringify(cards))
+  } catch {
+    // Ignore storage quota / privacy mode errors
+  }
+}
+
 function App() {
-  const [cards, setCards] = useKV<Flashcard[]>('flashcards', [])
+  const [cards, setCards] = useState<Flashcard[]>(() => loadFlashcardsFromStorage())
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isStudying, setIsStudying] = useState(false)
   const [isDeleteAllDialogOpen, setIsDeleteAllDialogOpen] = useState(false)
@@ -24,6 +44,10 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const cardList = cards || []
+
+  useEffect(() => {
+    saveFlashcardsToStorage(cardList)
+  }, [cardList])
 
   const handleAddCard = (question: string, answer: string) => {
     const newCard: Flashcard = {
