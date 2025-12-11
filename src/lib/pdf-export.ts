@@ -86,9 +86,38 @@ export function exportToPDF(cards: Flashcard[]) {
 
     doc.setTextColor(0, 0, 0)
     doc.setFont('helvetica', 'normal')
-    const answerLines = doc.splitTextToSize(card.answer, contentWidth - 10)
-    doc.text(answerLines, margin + 5, yPosition)
-    yPosition += answerLines.length * 5 + 10
+    
+    // Extract URLs from the answer text
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const urls = card.answer.match(urlRegex) || []
+    
+    // Remove URLs from the answer text to display separately
+    let answerTextOnly = card.answer
+    urls.forEach(url => {
+      // Remove URL and any separator characters (|, -, etc.) around it
+      answerTextOnly = answerTextOnly.replace(new RegExp(`\\s*[|\\-]?\\s*${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[|\\-]?\\s*`, 'g'), ' ')
+    })
+    answerTextOnly = answerTextOnly.trim()
+    
+    // Display answer text without URLs
+    const answerLines = doc.splitTextToSize(answerTextOnly, contentWidth - 10)
+    answerLines.forEach((line: string, lineIndex: number) => {
+      doc.text(line, margin + 5, yPosition + lineIndex * 5)
+    })
+    yPosition += answerLines.length * 5
+    
+    // Display URLs on separate lines below the answer
+    if (urls.length > 0) {
+      yPosition += 3 // Small gap before URLs
+      urls.forEach((url) => {
+        doc.setTextColor(0, 103, 192) // Blue color for links
+        doc.textWithLink(url, margin + 5, yPosition, { url: url })
+        yPosition += 5
+      })
+      doc.setTextColor(0, 0, 0) // Reset color
+    }
+    
+    yPosition += 10
 
     // Separator line
     if (index < cards.length - 1) {

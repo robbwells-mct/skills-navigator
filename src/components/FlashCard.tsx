@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { motion } from 'framer-motion'
+import { renderTextWithLinks } from '@/lib/linkify'
 
 interface FlashCardProps {
   question: string
@@ -42,9 +43,9 @@ export function FlashCard({ question, answer, onFlip }: FlashCardProps) {
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/80 via-blue-200 to-white/80"></div>
           <div className="flex-1 flex items-center justify-center w-full">
-            <p className="text-lg md:text-xl text-center leading-relaxed text-white font-medium">
-              {answer}
-            </p>
+            <div className="text-lg md:text-xl text-center leading-relaxed text-white font-medium">
+              {renderTextWithLinks(answer, "text-white hover:text-blue-100 underline block break-all")}
+            </div>
           </div>
           <div className="text-xs text-white/90 font-semibold tracking-widest">SKILLS NAVIGATOR</div>
         </Card>

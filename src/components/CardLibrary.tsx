@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Flashcard } from '@/lib/types'
 import { CardForm } from './CardForm'
+import { renderTextWithLinks } from '@/lib/linkify'
 import { Pencil, Trash } from '@phosphor-icons/react'
 
 interface CardLibraryProps {
@@ -48,7 +49,7 @@ export function CardLibrary({ cards, onEdit, onDelete }: CardLibraryProps) {
                   <Separator />
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Answer</p>
-                    <p>{card.answer}</p>
+                    <div>{renderTextWithLinks(card.answer)}</div>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -110,16 +111,16 @@ export function CardLibrary({ cards, onEdit, onDelete }: CardLibraryProps) {
       </Dialog>
 
       <AlertDialog open={!!deletingCardId} onOpenChange={() => setDeletingCardId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white/95 backdrop-blur-sm shadow-2xl border-2">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Card</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-xl font-bold">Delete Card</AlertDialogTitle>
+            <AlertDialogDescription className="text-base pt-2">
               Are you sure you want to delete this flashcard? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          <AlertDialogFooter className="gap-2 mt-4">
+            <AlertDialogCancel className="px-6">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-white hover:bg-red-700 px-6">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
