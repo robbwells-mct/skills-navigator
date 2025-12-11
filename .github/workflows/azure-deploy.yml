@@ -1,8 +1,6 @@
 name: Deploy to Azure App Service
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -28,6 +26,8 @@ jobs:
     - name: Add server + package.json to dist
       run: |
         cp server-cjs.js dist/server.js
+        cp startup.sh dist/startup.sh
+        chmod +x dist/startup.sh
         cat > dist/package.json << 'EOF'
         {
           "name": "skills-navigator",

@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,15 +9,28 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Serve static files from the current directory (where dist files are)
-app.use(express.static(__dirname));
+const distDir = path.join(__dirname, 'dist');
+// If deployed as a repo root with build output in ./dist
+const serveDir = existsSync(path.join(distDir, 'index.html')) ? distDir : __dirname;
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled promise rejection:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  process.exit(1);
+});
+
+// Serve static files
+app.use(express.static(serveDir));
 
 // Handle client-side routing - send all requests to index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(serveDir, 'index.html'));
 });
 
 app.listen(PORT, () => {
   console.log(`Skills Navigator server is running on port ${PORT}`);
-  console.log(`Serving files from: ${__dirname}`);
+  console.log(`Serving files from: ${serveDir}`);
 });

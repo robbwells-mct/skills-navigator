@@ -1,24 +1,27 @@
 #!/bin/sh
 set -e
 
-echo "Starting Skills Navigator static server..."
+echo "Starting Skills Navigator..."
 
 ROOT_DIR="/home/site/wwwroot"
-SERVE_DIR="$ROOT_DIR"
+PORT_VALUE="${PORT:-8080}"
+export PORT="$PORT_VALUE"
 
-# Some deploy methods place the built output under /home/site/wwwroot/dist
-if [ -f "$ROOT_DIR/dist/index.html" ]; then
-	SERVE_DIR="$ROOT_DIR/dist"
-fi
-
+echo "PORT=$PORT"
 echo "Root directory contents ($ROOT_DIR):"
 ls -la "$ROOT_DIR" || true
 
-echo "Serving directory: $SERVE_DIR"
-ls -la "$SERVE_DIR" || true
+if [ -f "$ROOT_DIR/dist/server.js" ]; then
+	echo "Found dist server. Starting: $ROOT_DIR/dist/server.js"
+	cd "$ROOT_DIR/dist"
+	exec node server.js
+fi
 
-cd "$SERVE_DIR"
-echo "Current directory: $(pwd)"
+if [ -f "$ROOT_DIR/server.js" ]; then
+	echo "Found root server. Starting: $ROOT_DIR/server.js"
+	cd "$ROOT_DIR"
+	exec node server.js
+fi
 
-echo "Starting pm2 static server on port 8080..."
-npx pm2 serve . 8080 --spa --no-daemon
+echo "No server.js found in $ROOT_DIR or $ROOT_DIR/dist"
+exit 1
