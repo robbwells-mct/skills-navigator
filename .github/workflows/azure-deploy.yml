@@ -28,8 +28,25 @@ jobs:
     - name: Copy server files to dist
       run: |
         cp server-cjs.js dist/server.js
-        cp package*.json dist/
-        cd dist && npm ci --production
+    
+    - name: Create production package.json for dist
+      run: |
+        cat > dist/package.json << 'EOF'
+        {
+          "name": "skills-navigator",
+          "version": "1.0.0",
+          "main": "server.js",
+          "scripts": {
+            "start": "node server.js"
+          },
+          "dependencies": {
+            "express": "^4.18.2"
+          }
+        }
+        EOF
+    
+    - name: Install production dependencies
+      run: cd dist && npm install --production
     
     - name: List dist contents for debugging
       run: ls -la dist/
