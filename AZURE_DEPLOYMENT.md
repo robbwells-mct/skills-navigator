@@ -19,7 +19,7 @@ This guide will help you deploy Skills Navigator to Azure App Service.
      - Resource Group: Create new or select existing
      - Name: `skills-navigator-[your-name]` (must be globally unique)
      - Publish: **Code**
-     - Runtime stack: **Node 20 LTS**
+     - Runtime stack: **Node 22 LTS**
      - Operating System: **Linux** or **Windows**
      - Region: Select nearest to you
      - Pricing Plan: Choose based on your needs (B1 Basic is good to start)
@@ -71,7 +71,7 @@ This guide will help you deploy Skills Navigator to Azure App Service.
 
 5. **Create Web App**
    ```bash
-   az webapp create --resource-group skills-navigator-rg --plan skills-navigator-plan --name skills-navigator-yourname --runtime "NODE:20-lts"
+   az webapp create --resource-group skills-navigator-rg --plan skills-navigator-plan --name skills-navigator-yourname --runtime "NODE:22-lts"
    ```
 
 6. **Deploy the application**
@@ -101,7 +101,7 @@ This guide will help you deploy Skills Navigator to Azure App Service.
    - Select your subscription
    - Select "Create new Web App"
    - Enter a unique name
-   - Select Node 20 LTS runtime
+   - Select Node 22 LTS runtime
    - Wait for deployment to complete
 
 ## Post-Deployment Configuration
@@ -112,7 +112,7 @@ In Azure Portal → Your App Service → Configuration → Application Settings:
 
 1. **Add Node version** (if needed)
    - Name: `WEBSITE_NODE_DEFAULT_VERSION`
-   - Value: `20-lts`
+   - Value: `22-lts`
 
 2. **Enable Always On** (for production)
    - Configuration → General Settings
@@ -144,7 +144,7 @@ Your app will be available at:
 ## Troubleshooting
 
 ### Build fails
-- Check Node version matches (20 LTS)
+- Check Node version matches (22 LTS)
 - Ensure all dependencies are in `package.json`
 - Run `npm run build` locally to test
 
