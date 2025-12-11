@@ -25,17 +25,15 @@ jobs:
     - name: Build application
       run: npm run build
     
-    - name: Prepare deployment package
+    - name: Copy server files to dist
       run: |
-        mkdir -p deploy
-        cp -r dist deploy/
-        cp server.js deploy/
-        cp package*.json deploy/
-        cd deploy && npm ci --production
+        cp server.js dist/
+        cp package*.json dist/
+        cd dist && npm ci --production
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ./deploy
+        package: ./dist
