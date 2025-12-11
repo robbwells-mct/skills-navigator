@@ -25,29 +25,10 @@ jobs:
     - name: Build application
       run: npm run build
     
-    - name: Copy server files to dist
+    - name: Copy configuration files to dist
       run: |
-        cp server-cjs.js dist/server.js
         cp web.config dist/
-    
-    - name: Create production package.json for dist
-      run: |
-        cat > dist/package.json << 'EOF'
-        {
-          "name": "skills-navigator",
-          "version": "1.0.0",
-          "main": "server.js",
-          "scripts": {
-            "start": "node server.js"
-          },
-          "dependencies": {
-            "express": "^4.18.2"
-          }
-        }
-        EOF
-    
-    - name: Install production dependencies
-      run: cd dist && npm install --production
+        cp staticwebapp.config.json dist/
     
     - name: List dist contents for debugging
       run: ls -la dist/
