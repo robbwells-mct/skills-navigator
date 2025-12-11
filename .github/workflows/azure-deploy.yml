@@ -29,6 +29,23 @@ jobs:
       run: |
         cp web.config dist/
         cp staticwebapp.config.json dist/
+        cp startup.sh dist/
+        chmod +x dist/startup.sh
+    
+    - name: Create package.json for pm2
+      run: |
+        cat > dist/package.json << 'EOF'
+        {
+          "name": "skills-navigator",
+          "version": "1.0.0",
+          "dependencies": {
+            "pm2": "^5.3.0"
+          }
+        }
+        EOF
+    
+    - name: Install pm2
+      run: cd dist && npm install --production
     
     - name: List dist contents for debugging
       run: ls -la dist/
