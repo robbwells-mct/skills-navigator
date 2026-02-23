@@ -15,7 +15,7 @@ export function exportToPDF(cards: Flashcard[]) {
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(16)
   doc.setFont('helvetica', 'bold')
-  doc.text('Skills Navigator', margin, 10)
+  doc.text('Skills Ready', margin, 10)
 
   yPosition = 30
 
@@ -140,12 +140,12 @@ export function exportToPDF(cards: Flashcard[]) {
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(8)
     doc.setFont('helvetica', 'normal')
-    doc.text('Skills Navigator - Master any subject with flashcards', margin, pageHeight - 5)
+    doc.text('Skills Ready - Master any subject with flashcards', margin, pageHeight - 5)
     
     // Page number
     doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin - 20, pageHeight - 5)
   }
 
   // Save the PDF
-  doc.save(`skills-navigator-flashcards-${Date.now()}.pdf`)
+  doc.save(`skills-ready-flashcards-${Date.now()}.pdf`)
 }

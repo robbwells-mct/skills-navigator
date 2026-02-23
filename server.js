@@ -31,6 +31,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Skills Navigator server is running on port ${PORT}`);
+  console.log(`Skills Ready server is running on port ${PORT}`);
   console.log(`Serving files from: ${serveDir}`);
 });

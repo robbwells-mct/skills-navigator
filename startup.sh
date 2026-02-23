@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "Starting Skills Navigator..."
+echo "Starting Skills Ready..."
 
 ROOT_DIR="/home/site/wwwroot"
 PORT_VALUE="${PORT:-8080}"
