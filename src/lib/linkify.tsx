@@ -22,9 +22,25 @@ export function extractLinks(text: string): LinkifyResult {
 }
 
 function isSafeHttpUrl(link: string): boolean {
+  // Reject obvious bad inputs early
+  if (!link || /\s/.test(link)) {
+    return false
+  }
+
   try {
     const url = new URL(link)
-    return url.protocol === 'http:' || url.protocol === 'https:'
+
+    // Allow only http and https URLs
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return false
+    }
+
+    // Require a valid hostname
+    if (!url.hostname) {
+      return false
+    }
+
+    return true
   } catch {
     return false
   }
