@@ -2,12 +2,18 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
+import rateLimit from 'express-rate-limit';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
 
 const distDir = path.join(__dirname, 'dist');
 // If deployed as a repo root with build output in ./dist
@@ -26,7 +32,7 @@ process.on('uncaughtException', (err) => {
 app.use(express.static(serveDir));
 
 // Handle client-side routing - send all requests to index.html
-app.get('*', (req, res) => {
+app.get('*', limiter, (req, res) => {
   res.sendFile(path.join(serveDir, 'index.html'));
 });
 
