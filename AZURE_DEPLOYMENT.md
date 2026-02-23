@@ -1,6 +1,6 @@
 # Azure App Service Deployment Guide
 
-This guide will help you deploy Skills Navigator to Azure App Service.
+This guide will help you deploy Skills Ready to Azure App Service.
 
 ## Prerequisites
 
@@ -193,4 +193,4 @@ For issues:
 
 ---
 
-Your Skills Navigator app is now ready for Azure deployment! 🚀
+Your Skills Ready app is now ready for Azure deployment! 🚀

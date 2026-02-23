@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { FlashCard } from './FlashCard'
@@ -12,25 +12,21 @@ interface StudyModeProps {
 
 export function StudyMode({ cards, onExit }: StudyModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isFlipped, setIsFlipped] = useState(false)
+  const [, setIsFlipped] = useState(false)
 
   const progress = ((currentIndex + 1) / cards.length) * 100
   const canGoPrevious = currentIndex > 0
   const canGoNext = currentIndex < cards.length - 1
 
-  const handlePrevious = () => {
-    if (canGoPrevious) {
-      setCurrentIndex(currentIndex - 1)
-      setIsFlipped(false)
-    }
-  }
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((index) => (index > 0 ? index - 1 : index))
+    setIsFlipped(false)
+  }, [setIsFlipped])
 
-  const handleNext = () => {
-    if (canGoNext) {
-      setCurrentIndex(currentIndex + 1)
-      setIsFlipped(false)
-    }
-  }
+  const handleNext = useCallback(() => {
+    setCurrentIndex((index) => (index < cards.length - 1 ? index + 1 : index))
+    setIsFlipped(false)
+  }, [cards.length, setIsFlipped])
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -45,7 +41,7 @@ export function StudyMode({ cards, onExit }: StudyModeProps) {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [currentIndex])
+  }, [handleNext, handlePrevious])
 
   if (cards.length === 0) {
     return null

@@ -34,7 +34,7 @@ export function FlashCard({ question, answer, onFlip }: FlashCardProps) {
               {question}
             </p>
           </div>
-          <div className="text-xs text-blue-600 font-semibold tracking-widest">SKILLS NAVIGATOR</div>
+          <div className="text-xs text-blue-600 font-semibold tracking-widest">SKILLS READY</div>
         </Card>
 
         <Card 
@@ -47,7 +47,7 @@ export function FlashCard({ question, answer, onFlip }: FlashCardProps) {
               {renderTextWithLinks(answer, "text-white hover:text-blue-100 underline block break-all")}
             </div>
           </div>
-          <div className="text-xs text-white/90 font-semibold tracking-widest">SKILLS NAVIGATOR</div>
+          <div className="text-xs text-white/90 font-semibold tracking-widest">SKILLS READY</div>
         </Card>
       </motion.div>
     </div>

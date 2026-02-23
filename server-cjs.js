@@ -22,5 +22,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Skills Navigator running on port ${PORT}`);
+  console.log(`Skills Ready running on port ${PORT}`);
 });
