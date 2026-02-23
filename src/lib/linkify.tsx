@@ -21,15 +21,25 @@ export function extractLinks(text: string): LinkifyResult {
   }
 }
 
+function isSafeHttpUrl(link: string): boolean {
+  try {
+    const url = new URL(link)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 export function renderTextWithLinks(text: string, linkClassName?: string): React.ReactNode {
   const { text: textOnly, links } = extractLinks(text)
+  const safeLinks = links.filter(isSafeHttpUrl)
   
   return (
     <>
       <span>{textOnly}</span>
-      {links.length > 0 && (
+      {safeLinks.length > 0 && (
         <div className="mt-2 space-y-1">
-          {links.map((link, index) => (
+          {safeLinks.map((link, index) => (
             <a
               key={index}
               href={link}
