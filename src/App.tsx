@@ -5,13 +5,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Flashcard } from '@/lib/types'
 import { parseCSV, readFileAsText } from '@/lib/csv-parser'
 import { exportToPDF } from '@/lib/pdf-export'
 import { CardForm } from '@/components/CardForm'
 import { CardLibrary } from '@/components/CardLibrary'
 import { StudyMode } from '@/components/StudyMode'
-import { Plus, Upload, BookOpen, Cards, FilePdf, Trash } from '@phosphor-icons/react'
+import { CopilotConfigForm } from '@/components/CopilotConfig'
+import { CopilotDashboard } from '@/components/CopilotDashboard'
+import type { CopilotConfig } from '@/lib/copilot-types'
+import { Plus, Upload, BookOpen, Cards, FilePdf, Trash, GithubLogo } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 const FLASHCARDS_STORAGE_KEY = 'flashcards'
@@ -42,6 +46,7 @@ function App() {
   const [isDeleteAllDialogOpen, setIsDeleteAllDialogOpen] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [copilotConfig, setCopilotConfig] = useState<CopilotConfig | null>(null)
 
   const cardList = cards
 
@@ -140,6 +145,20 @@ function App() {
 
         <Separator />
 
+        <Tabs defaultValue="flashcards">
+          <TabsList className="mb-2">
+            <TabsTrigger value="flashcards" className="gap-1.5">
+              <Cards size={16} />
+              Flashcards
+            </TabsTrigger>
+            <TabsTrigger value="copilot" className="gap-1.5">
+              <GithubLogo size={16} />
+              Copilot Usage
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="flashcards">
+
         {importError && (
           <Alert variant="destructive">
             <AlertDescription>{importError}</AlertDescription>
@@ -236,6 +255,19 @@ function App() {
             />
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="copilot">
+            {copilotConfig ? (
+              <CopilotDashboard
+                config={copilotConfig}
+                onDisconnect={() => setCopilotConfig(null)}
+              />
+            ) : (
+              <CopilotConfigForm onConnect={setCopilotConfig} />
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
