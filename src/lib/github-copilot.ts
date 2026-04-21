@@ -116,19 +116,11 @@ function aggregateDays(days: CopilotMetricsDay[]): {
   let chatUsers = 0
   let totalChats = 0
 
-  const seenActive = new Set<string>()
-  const seenEngaged = new Set<string>()
-
   for (const day of days) {
-    // Use unique user counts from peak day approach (simpler: sum, acknowledge overlap)
-    if (!seenActive.has(day.date)) {
-      totalActiveUsers += day.total_active_users
-      seenActive.add(day.date)
-    }
-    if (!seenEngaged.has(day.date)) {
-      totalEngagedUsers += day.total_engaged_users
-      seenEngaged.add(day.date)
-    }
+    // Sum daily user counts over the period. Users may be active on multiple
+    // days, so this represents total user-days, not unique users.
+    totalActiveUsers += day.total_active_users
+    totalEngagedUsers += day.total_engaged_users
 
     const completions = day.copilot_ide_code_completions
     if (completions?.languages) {
@@ -204,11 +196,14 @@ export function buildOrgSummary(repos: RepoMetricsSummary[]): OrgSummary {
   const totalSuggestions = repos.reduce((s, r) => s + r.totalSuggestions, 0)
   const totalAcceptances = repos.reduce((s, r) => s + r.totalAcceptances, 0)
 
+  // User counts across repos cannot be deduplicated without org-level API data.
+  // We sum per-repo engaged users as an approximation; the real unique count may
+  // be lower if the same user is active in multiple repos.
   return {
     totalRepos: repos.length,
     reposWithData,
-    totalActiveUsers: Math.max(...repos.map(r => r.totalActiveUsers), 0),
-    totalEngagedUsers: Math.max(...repos.map(r => r.totalEngagedUsers), 0),
+    totalActiveUsers: repos.reduce((s, r) => s + r.totalActiveUsers, 0),
+    totalEngagedUsers: repos.reduce((s, r) => s + r.totalEngagedUsers, 0),
     totalSuggestions,
     totalAcceptances,
     totalLinesAccepted: repos.reduce((s, r) => s + r.totalLinesAccepted, 0),

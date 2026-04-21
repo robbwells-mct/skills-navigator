@@ -29,6 +29,30 @@ import {
 } from '@phosphor-icons/react'
 import { subDays, format } from 'date-fns'
 
+// Acceptance rate thresholds and chart colors
+const RATE_HIGH = 30
+const RATE_MED = 15
+const COLOR_HIGH = 'oklch(0.55 0.18 155)'
+const COLOR_MED = 'oklch(0.55 0.18 250)'
+const COLOR_LOW = 'oklch(0.55 0.18 30)'
+
+function acceptanceColor(rate: number): string {
+  if (rate >= RATE_HIGH) return COLOR_HIGH
+  if (rate >= RATE_MED) return COLOR_MED
+  return COLOR_LOW
+}
+
+function acceptanceTextClass(rate: number): string {
+  if (rate >= RATE_HIGH) return 'text-green-600 font-semibold'
+  if (rate >= RATE_MED) return 'text-blue-600'
+  return 'text-orange-500'
+}
+
+function pct(numerator: number, denominator: number): number {
+  if (denominator === 0) return 0
+  return Math.round((numerator / denominator) * 100)
+}
+
 type SortField = 'repoName' | 'totalSuggestions' | 'totalAcceptances' | 'acceptanceRate' | 'totalEngagedUsers' | 'totalChats'
 type SortDir = 'asc' | 'desc'
 type DateRange = '7' | '14' | '28' | 'custom'
@@ -38,17 +62,33 @@ interface CopilotDashboardProps {
   onDisconnect: () => void
 }
 
+type StatCardColor = {
+  border: string
+  bg: string
+}
+
+const STAT_COLORS: Record<string, StatCardColor> = {
+  blue:    { border: 'border-l-blue-500',    bg: 'bg-blue-50' },
+  indigo:  { border: 'border-l-indigo-500',  bg: 'bg-indigo-50' },
+  green:   { border: 'border-l-green-500',   bg: 'bg-green-50' },
+  purple:  { border: 'border-l-purple-500',  bg: 'bg-purple-50' },
+  sky:     { border: 'border-l-sky-400',     bg: 'bg-sky-50' },
+  emerald: { border: 'border-l-emerald-400', bg: 'bg-emerald-50' },
+  violet:  { border: 'border-l-violet-400',  bg: 'bg-violet-50' },
+}
+
 function StatCard({
-  label, value, sub, icon: Icon, color,
+  label, value, sub, icon: Icon, colorKey,
 }: {
   label: string
   value: string | number
   sub?: string
   icon: React.ElementType
-  color: string
+  colorKey: keyof typeof STAT_COLORS
 }) {
+  const colors = STAT_COLORS[colorKey]
   return (
-    <Card className={`border-l-4 ${color}`}>
+    <Card className={`border-l-4 ${colors.border}`}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
@@ -56,7 +96,7 @@ function StatCard({
             <p className="text-2xl font-bold mt-1">{typeof value === 'number' ? value.toLocaleString() : value}</p>
             {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
           </div>
-          <div className={`p-2 rounded-lg bg-opacity-10 ${color.replace('border-l-', 'bg-').split('-4')[0]}`}>
+          <div className={`p-2 rounded-lg ${colors.bg}`}>
             <Icon size={22} className="text-muted-foreground" />
           </div>
         </div>
@@ -269,28 +309,28 @@ export function CopilotDashboard({ config, onDisconnect }: CopilotDashboardProps
               value={orgSummary.totalRepos}
               sub={`${orgSummary.reposWithData} with Copilot data`}
               icon={ChartBar}
-              color="border-l-blue-500"
+              colorKey="blue"
             />
             <StatCard
               label="Total Suggestions"
               value={orgSummary.totalSuggestions}
               sub={`${orgSummary.totalLinesAccepted.toLocaleString()} lines accepted`}
               icon={Code}
-              color="border-l-indigo-500"
+              colorKey="indigo"
             />
             <StatCard
               label="Acceptance Rate"
               value={`${orgSummary.acceptanceRate}%`}
               sub={`${orgSummary.totalAcceptances.toLocaleString()} acceptances`}
               icon={CheckCircle}
-              color="border-l-green-500"
+              colorKey="green"
             />
             <StatCard
               label="Engaged Users"
               value={orgSummary.totalEngagedUsers}
               sub={`${orgSummary.totalChats.toLocaleString()} chats`}
               icon={Users}
-              color="border-l-purple-500"
+              colorKey="purple"
             />
           </div>
 
@@ -299,21 +339,21 @@ export function CopilotDashboard({ config, onDisconnect }: CopilotDashboardProps
               label="Lines Suggested"
               value={orgSummary.totalLinesSuggested}
               icon={Code}
-              color="border-l-sky-400"
+              colorKey="sky"
             />
             <StatCard
               label="Lines Accepted"
               value={orgSummary.totalLinesAccepted}
-              sub={orgSummary.totalLinesSuggested > 0 ? `${Math.round((orgSummary.totalLinesAccepted / orgSummary.totalLinesSuggested) * 100)}% of suggested` : undefined}
+              sub={orgSummary.totalLinesSuggested > 0 ? `${pct(orgSummary.totalLinesAccepted, orgSummary.totalLinesSuggested)}% of suggested` : undefined}
               icon={CheckCircle}
-              color="border-l-emerald-400"
+              colorKey="emerald"
             />
             <StatCard
               label="IDE Chat Users"
               value={orgSummary.totalChatUsers}
               sub={`${orgSummary.totalChats.toLocaleString()} total chats`}
               icon={Chat}
-              color="border-l-violet-400"
+              colorKey="violet"
             />
           </div>
 
@@ -355,14 +395,14 @@ export function CopilotDashboard({ config, onDisconnect }: CopilotDashboardProps
                       {chartData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={entry.acceptanceRate >= 30 ? 'oklch(0.55 0.18 155)' : entry.acceptanceRate >= 15 ? 'oklch(0.55 0.18 250)' : 'oklch(0.55 0.18 30)'}
+                          fill={acceptanceColor(entry.acceptanceRate)}
                         />
                       ))}
                     </Bar>
                   </BarChart>
                 </ChartContainer>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Green ≥ 30% · Blue ≥ 15% · Orange &lt; 15%
+                  Green ≥ {RATE_HIGH}% · Blue ≥ {RATE_MED}% · Orange &lt; {RATE_MED}%
                 </p>
               </CardContent>
             </Card>
@@ -462,13 +502,7 @@ export function CopilotDashboard({ config, onDisconnect }: CopilotDashboardProps
                         </TableCell>
                         <TableCell className="text-right">
                           {repo.totalSuggestions > 0 ? (
-                            <span className={
-                              repo.acceptanceRate >= 30
-                                ? 'text-green-600 font-semibold'
-                                : repo.acceptanceRate >= 15
-                                ? 'text-blue-600'
-                                : 'text-orange-500'
-                            }>
+                            <span className={acceptanceTextClass(repo.acceptanceRate)}>
                               {repo.acceptanceRate}%
                             </span>
                           ) : '—'}
